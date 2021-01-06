@@ -30,6 +30,7 @@ export class Game {
     private _poolGame: GameWorld;
     private _isLoading: boolean;
     private _inGame: boolean;
+    private _firstUpdate = true;
 
     //------Private Methods------//
 
@@ -73,12 +74,16 @@ export class Game {
         }
     }
 
-    private update(): void {
+    private update(): boolean {
         if (this._isLoading) return;
+        let changed = this._firstUpdate;
+        this._firstUpdate = false;
+
         this.handleInput();
-        this._menu.active ? this._menu.update() : this._poolGame.update();
+        changed ||= (this._menu.active ? this._menu.update() : this._poolGame.update());
         Keyboard.reset();
         Mouse.reset();
+        return changed;
     }
 
     private draw(): void {
@@ -90,8 +95,9 @@ export class Game {
     }
 
     private gameLoop(): void {
-        this.update();
-        this.draw();
+        if( this.update() ) {
+            this.draw();
+        }
         window.requestAnimationFrame(() => {
             this.gameLoop();
         });
@@ -132,6 +138,7 @@ export class Game {
 
     public start(): void {
         this.displayLoadingScreen().then(() => {
+            this._firstUpdate = true;
             this._menu.active = false;
             this._inGame = true;
             this._poolGame = new GameWorld();

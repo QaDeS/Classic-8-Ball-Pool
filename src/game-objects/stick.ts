@@ -80,20 +80,24 @@ export class Stick {
         return this._power >= 0;
     }
 
-    private updatePower(): void {
-
+    private updatePower(): boolean {
         if (Keyboard.isDown(inputConfig.increaseShotPowerKey) && this.isLessThanMaxPower()) {
             this.increasePower();
         }
         else if (Keyboard.isDown(inputConfig.decreaseShotPowerKey) && this.isMoreThanMinPower()) {
             this.decreasePower();
+        } else {
+            return false
         }
+        return true;
     }
 
-    private updateRotation(): void {
+    private updateRotation(): boolean {
         const opposite: number = Mouse.position.y - this._position.y;
         const adjacent: number = Mouse.position.x - this._position.x;
+        const oldRotation = this._rotation;
         this._rotation = Math.atan2(opposite, adjacent);
+        return Math.abs(oldRotation - this._rotation) > 0.00001
     }
 
     //------Public Methods------//
@@ -117,11 +121,13 @@ export class Stick {
         Assets.playSound(sounds.paths.strike, volume);
     }
 
-    public update(): void {
+    public update(): boolean {
+        let changed = false
         if(this._movable) {
-            this.updateRotation();
-            this.updatePower();
+            changed ||= this.updateRotation();
+            changed ||= this.updatePower();
         }
+        return changed;
     }
 
     public draw(): void {

@@ -103,7 +103,7 @@ export class Ball {
         this._visible = false;
     }
 
-    public update(): void {
+    public update(): boolean {
         if(this._moving) {
             this._velocity.multBy(1 - physicsConfig.friction);
             this._position.addTo(this._velocity);
@@ -113,6 +113,7 @@ export class Ball {
                 this._moving = false;
             }
         }
+        return this._moving;
     }
 
     public draw(): void {

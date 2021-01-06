@@ -48,21 +48,25 @@ export class MenuButton {
 
     //------Public Methods------//
     
-    public handleInput() {
-
+    public handleInput(): boolean {
+        const oldHovered = this.hovered;
         this.hovered = this.isInsideButton(Mouse.position);
+        let result = oldHovered != this.hovered;
+
         this._activeSprite = this._hovered ? 
                              Assets.getSprite(sprites.paths[this._spriteOnHoverKey]) : 
                              Assets.getSprite(sprites.paths[this._spriteKey]);
 
         if(this._hovered && Mouse.isPressed(inputConfig.mouseSelectButton)) {
+            result = true;
             Canvas2D.changeCursor(cursorConfig.default);
             this._command.execute(this._value);
         }
+        return result;
     }
 
-    public update(): void {
-        this.handleInput();
+    public update(): boolean {
+        return this.handleInput();
     }
 
     public draw(): void {

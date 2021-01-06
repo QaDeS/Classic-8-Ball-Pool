@@ -85,9 +85,10 @@ export class GameWorld {
         return this._balls.filter((ball: Ball) => ball.color === color);
     }
 
-    private handleInput(): void {
+    private handleInput(): boolean {
         if (AI.finishedSession && Mouse.isPressed(inputConfig.mouseShootButton)) {
             this.shootCueBall(this._stick.power, this._stick.rotation);
+            return true;
         }
     }
 
@@ -263,16 +264,20 @@ export class GameWorld {
         });
     }
 
-    private handleBallInHand(): void {
+    private handleBallInHand(): boolean {
+        let changed = false;
 
         if(Mouse.isPressed(inputConfig.mousePlaceBallButton) && this.isValidPosToPlaceCueBall(Mouse.position)) {
+            changed = true;
             this.placeBallInHand(Mouse.position);
         }
         else {
             this._stick.movable = false;
             this._stick.visible = false;
+            changed ||= this._cueBall.position != Mouse.position;
             this._cueBall.position = Mouse.position;
         }
+        return changed;
     }
 
     private handleGameOver(): void {
@@ -442,23 +447,25 @@ export class GameWorld {
         }
     }
 
-    public update(): void {
+    public update(): boolean {
+        let changed = false;
 
         if(this.isBallInHand) {
-            this.handleBallInHand();
-            return;
+            changed ||= this.handleBallInHand();
+            return changed;
         }
 
         this.handleBallsInPockets();
         this.handleCollisions();
         this.handleInput();
-        this._stick.update();
+        changed ||= this._stick.update();
         this._balls.forEach((ball: Ball) => ball.update());
 
         if(!this.isBallsMoving && !this._stick.visible) {
             this.concludeTurn();
             this.nextTurn();
         }
+        return changed || this.isBallsMoving;
     }
 
     public draw(): void {

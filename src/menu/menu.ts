@@ -65,12 +65,18 @@ export class Menu {
         return this._subMenus[index];
     }
 
-    public update(): void {
+    public update(): boolean {
+        let result = false
         if(this._active) {
-            this._buttons.forEach((button: MenuButton) => button.update());
+            this._buttons.forEach((button: MenuButton) => {
+                result ||= button.update();
+            });
         }
 
-        this._subMenus.forEach((menu: Menu) => menu.update());
+        this._subMenus.forEach((menu: Menu) => {
+            result ||= menu.update()
+        });
+        return result;
     }
 
     public draw(): void {
