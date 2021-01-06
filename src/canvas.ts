@@ -104,6 +104,27 @@ class Canvas2D_Singleton {
         this._context.restore();
     }
 
+    public drawShotLine(position: IVector2, rotation: number, length: number, diameter: number) {
+        this._context.save();
+        this._context.scale(this._scale.x, this._scale.y);
+        this._context.translate(position.x, position.y);
+        this._context.rotate(rotation);
+
+        this._context.lineWidth = 3;
+        this._context.strokeStyle = 'grey';
+
+        this._context.beginPath();
+        this._context.moveTo(0, 0);
+        this._context.lineTo(length, 0);
+        this._context.stroke();
+
+        this._context.beginPath();
+        this._context.ellipse(length, 0, diameter / 2, diameter / 2, 0, 0, 2 * Math.PI)
+        this._context.stroke();
+
+        this._context.restore();
+    }
+
     public changeCursor(cursor: string): void {
         this._canvas.style.cursor = cursor;
     }

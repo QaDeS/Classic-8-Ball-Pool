@@ -119,7 +119,7 @@ export const GameConfig : IGameConfig = {
     },
 
     physics: {
-        friction: 0.0108,
+        friction: 0.015,
         collisionLoss: 0.018,
     },
 

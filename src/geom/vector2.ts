@@ -88,6 +88,14 @@ export class Vector2 implements IVector2 {
         return this._x * vector.x + this._y * vector.y;
     }
 
+    public project(vector: Vector2): Vector2 {
+        return vector.mult(this.dot(vector) / vector.dot(vector))
+    }
+
+    public reject(vector: Vector2): Vector2 {
+        return this.subtract(this.project(vector));
+    }
+
     public distFrom(vector: Vector2): number {
         return this.subtract(vector).length;
     }

@@ -55,10 +55,15 @@ export class Game {
                 Assets.getSprite(sprites.paths.controls),
                 GameConfig.loadingScreenImagePosition
                 );
-            setTimeout(() => {
+            const endScreen = () => {
                 this._isLoading = false;
                 resolve();
-            }, GameConfig.loadingScreenTimeout);
+            };
+            const timeout = setTimeout(endScreen, GameConfig.loadingScreenTimeout);
+            if( Mouse.isDown(inputConfig.mouseShootButton) ) {
+                clearTimeout(timeout);
+                endScreen();
+            }
         });
     }
 

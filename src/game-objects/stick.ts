@@ -130,9 +130,10 @@ export class Stick {
         return changed;
     }
 
-    public draw(): void {
+    public draw(length: number, diameter: number): void {
         if(this._visible) {
             Canvas2D.drawImage(this._sprite, this._position, this._rotation, this._origin);
+            Canvas2D.drawShotLine(this._position, this._rotation, length, diameter);
         }
     }
 

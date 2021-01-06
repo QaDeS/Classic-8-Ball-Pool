@@ -468,12 +468,36 @@ export class GameWorld {
         return changed || this.isBallsMoving;
     }
 
+    private getShotLength(): number {
+        const { power, rotation, position } = this._stick;
+        const line = new Vector2(power * Math.cos(rotation), power * Math.sin(rotation));
+        let shortest = power * power * 10;
+        
+        this._balls.forEach((ball, i) => {
+            if( ball.color === Color.white ) return;
+
+            const tb = ball.position.subtract(position) // relative to cue ball
+            if( tb.dot(line) < 0 ) return; // ignore if behind the cue ball
+
+            const cpd = tb.reject(line); // tangent to shot line
+            if( cpd.length < ballConfig.diameter ) { // it's in hit proximity
+                const tangentPoint = tb.add(cpd)
+                const ensureDistance = (1-Math.pow(cpd.length / ballConfig.diameter, 8)) * ballConfig.diameter; // TODO wrong, but kind of works
+                const len = tangentPoint.length - ensureDistance
+                if( len < shortest ) shortest = len
+            }
+        })
+        // TODO limit to first border contact
+        return shortest;
+    }
+
     public draw(): void {
         Canvas2D.drawImage(Assets.getSprite(sprites.paths.table));
         this.drawCurrentPlayerLabel();
         this.drawMatchScores();
         this.drawOverallScores();
         this._balls.forEach((ball: Ball) => ball.draw());
-        this._stick.draw();
+        const shootLine = this.getShotLength();
+        this._stick.draw(shootLine, ballConfig.diameter);
     }
 }
