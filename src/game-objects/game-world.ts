@@ -482,12 +482,31 @@ export class GameWorld {
             const cpd = tb.reject(line); // tangent to shot line
             if( cpd.length < ballConfig.diameter ) { // it's in hit proximity
                 const tangentPoint = tb.add(cpd)
-                const ensureDistance = (1-Math.pow(cpd.length / ballConfig.diameter, 8)) * ballConfig.diameter; // TODO wrong, but kind of works
+                const ensureDistance = (1-Math.pow(cpd.length / ballConfig.diameter, 3)) * ballConfig.diameter; // TODO wrong, but kind of works
                 const len = tangentPoint.length - ensureDistance
                 if( len < shortest ) shortest = len
             }
         })
-        // TODO limit to first border contact
+
+        const endPos = line.mult(shortest / line.length)
+        const pad = tableConfig.cushionWidth + ballConfig.diameter / 2
+        const lower = new Vector2(-position.x + pad, -position.y + pad)
+        const upper = new Vector2(-position.x + gameSize.x - pad, -position.y + gameSize.y - pad)
+
+        const limited = new Vector2(
+            Math.min(upper.x, Math.max(lower.x, endPos.x)),
+            Math.min(upper.y, Math.max(lower.y, endPos.y))
+        )
+        const shorten = new Vector2(
+            limited.x / endPos.x,
+            limited.y / endPos.y
+        )
+
+        console.log("BOUNDS", lower, upper, endPos, limited, shorten)
+
+
+        shortest *= Math.min(shorten.x, shorten.y)
+
         return shortest;
     }
 
